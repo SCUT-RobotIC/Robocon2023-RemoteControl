@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,12 +29,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     joystick.cpp \
-    joy_thread.cpp
+    joy_thread.cpp \
+    serial.cpp
 
 HEADERS += \
         mainwindow.h \
     joystick.h \
-    joy_thread.h
+    joy_thread.h \
+    serial.h
 
 FORMS += \
         mainwindow.ui

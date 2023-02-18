@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+
 #include "ui_mainwindow.h"
 
 static Joy_Thread *joy_thread;
@@ -9,8 +10,24 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
 
+
+
+    QStringList m_serialPortName;
+    foreach(const QSerialPortInfo &info,QSerialPortInfo::availablePorts())
+    {
+        m_serialPortName << info.portName();//获取可用串口信息
+
+
+        //qDebug()<<"serialPortName:"<<info.portName();
+    }
+    SerialPort.setPortName(m_serialPortName[0]);
+    SerialPort.openSerial();
+    SerialCommand.resize(0);
+
+    //QSerialPort *dulplex_port=new QSerialPort;
+    ui->setupUi(this);
+    ui->serial_comboBox->addItems(m_serialPortName);//寻找已经打开的串口
     joy_thread = new Joy_Thread();
     qRegisterMetaType<joyinfoex_tag>("joyinfoex_tag");//注册一种信号的参数类型
     connect(joy_thread, SIGNAL(JoySignal_row(joyinfoex_tag)), this, SLOT(display_slot_row(joyinfoex_tag)));
@@ -58,6 +75,7 @@ void MainWindow::clearDisplay()
 
 void MainWindow::display_slot_row(joyinfoex_tag state_row)
 {
+    SerialCommand.clear();
     QString s;
     s.append("dwSize=").append(QString::number(state_row.dwSize)).append("\n");
     s.append("dwFlags=").append(QString::number(state_row.dwFlags)).append("\n");
@@ -72,7 +90,26 @@ void MainWindow::display_slot_row(joyinfoex_tag state_row)
     s.append("dwPOV=").append(QString::number(state_row.dwPOV)).append("\n");
     s.append("dwReserved1=").append(QString::number(state_row.dwReserved1)).append("\n");
     s.append("dwReserved2=").append(QString::number(state_row.dwReserved2)).append("\n");
+    if(serialOpen){
+        SerialCommand.append(QString::number(state_row.dwSize).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwFlags).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwXpos).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwYpos).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwZpos).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwRpos).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwUpos).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwVpos).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwButtons).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwButtonNumber).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwPOV).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwReserved1).toUtf8()).append("\n");
+        SerialCommand.append(QString::number(state_row.dwReserved2).toUtf8()).append("\n");
 
+        if(!SerialPort .WriteToSerial(SerialCommand)){
+            s.append("send fail!\n");
+        }
+    s.append(SerialPort.ReadFromSerial());
+    }
     ui->textEdit->setText(s);
 
     clearDisplay();
@@ -191,3 +228,29 @@ void MainWindow::display_slot_row(joyinfoex_tag state_row)
 
     }
 }
+
+
+
+
+
+void MainWindow::on_serial_comboBox_currentTextChanged(const QString &arg1)
+{
+    SerialPort.setPortName(arg1);
+}
+
+
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    if(SerialPort.openSerial()){
+        ui->pushButton->setText("关闭串口");
+        serialOpen=true;
+    }
+    else if(SerialPort.closeSerial()){
+        ui->pushButton->setText("打开串口");
+        serialOpen=false;
+    }
+
+}
+
