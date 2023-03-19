@@ -91,19 +91,21 @@ void MainWindow::display_slot_row(joyinfoex_tag state_row)
     s.append("dwReserved1=").append(QString::number(state_row.dwReserved1)).append("\n");
     s.append("dwReserved2=").append(QString::number(state_row.dwReserved2)).append("\n");
     if(serialOpen){
-        SerialCommand.append(QString::number(state_row.dwSize).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwFlags).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwXpos).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwYpos).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwZpos).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwRpos).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwUpos).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwVpos).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwButtons).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwButtonNumber).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwPOV).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwReserved1).toUtf8()).append("\n");
-        SerialCommand.append(QString::number(state_row.dwReserved2).toUtf8()).append("\n");
+        SerialCommand.append(uchar(state_row.dwSize>>8)).append(uchar(state_row.dwSize));
+        SerialCommand.append(uchar(state_row.dwFlags>>8)).append(uchar(state_row.dwFlags));
+        SerialCommand.append(uchar(state_row.dwXpos>>8)).append(uchar(state_row.dwXpos));
+        SerialCommand.append(uchar(state_row.dwYpos>>8)).append(uchar(state_row.dwYpos));
+        SerialCommand.append(uchar(state_row.dwZpos>>8)).append(uchar(state_row.dwZpos));
+        SerialCommand.append(uchar(state_row.dwRpos>>8)).append(uchar(state_row.dwRpos));
+        SerialCommand.append(uchar(state_row.dwUpos>>8)).append(uchar(state_row.dwUpos));
+        SerialCommand.append(uchar(state_row.dwVpos>>8)).append(uchar(state_row.dwVpos));
+        SerialCommand.append(uchar(state_row.dwButtons>>8)).append(uchar(state_row.dwButtons));
+        SerialCommand.append(uchar(state_row.dwButtonNumber>>8)).append(uchar(state_row.dwButtonNumber));
+        SerialCommand.append(uchar(state_row.dwPOV>>8)).append(uchar(state_row.dwPOV));
+        SerialCommand.append(uchar(state_row.dwReserved1>>8)).append(uchar(state_row.dwReserved1));
+        SerialCommand.append(uchar(state_row.dwReserved2>>8)).append(uchar(state_row.dwReserved2));
+        uint16_t a=SerialCommand[4]<<8|SerialCommand[5];
+        SerialCommand.append('\t');
 
         if(!SerialPort .WriteToSerial(SerialCommand)){
             s.append("send fail!\n");

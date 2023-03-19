@@ -32,16 +32,16 @@ bool MySerial::WriteToSerial(QByteArray cmd)
     this->m_SerialPort->clear();
     this->m_SerialPort->write(cmd);
     this->m_SerialPort->flush();    //尽可能多地从内部写缓冲区写入底层串口而不阻塞
-    this->m_SerialPort->waitForBytesWritten(10);
+    this->m_SerialPort->waitForBytesWritten(50);
     return true;
 }
 
 QByteArray MySerial::ReadFromSerial()
 {
     QByteArray readData;
-    this->m_SerialPort->waitForReadyRead(5);
+    this->m_SerialPort->waitForReadyRead(25);
     readData.append(this->m_SerialPort->readAll());
-    while (this->m_SerialPort->waitForReadyRead(5)) readData.append(this->m_SerialPort->readAll());
+    while (this->m_SerialPort->waitForReadyRead(25)) readData.append(this->m_SerialPort->readAll());
     if(readData.isEmpty()) return QByteArray();
 //    qDebug() << "[ == MySerial == ] Read Data:" << readData.toHex();
     return readData;
