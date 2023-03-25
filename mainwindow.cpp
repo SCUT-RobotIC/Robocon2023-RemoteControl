@@ -3,7 +3,15 @@
 #include "ui_mainwindow.h"
 
 static Joy_Thread *joy_thread;
-
+static QString parse(const QByteArray data){
+    QString parsed;
+    uint16_t temp;
+  for(int i=0;i<data.length()/2;i++){
+      temp=uint16_t(data[2*i])<<8|uint16_t(data[2*i+1]);
+    parsed.append(QString::number(temp)+"\n");
+  }
+  return parsed;
+}
 const QString BTN_color("background-color: rgb(255, 32, 85);");
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -14,19 +22,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     QStringList m_serialPortName;
-    foreach(const QSerialPortInfo &info,QSerialPortInfo::availablePorts())
-    {
-        m_serialPortName << info.portName();//获取可用串口信息
 
 
-        //qDebug()<<"serialPortName:"<<info.portName();
-    }
-    SerialPort.setPortName(m_serialPortName[0]);
-    SerialPort.openSerial();
     SerialCommand.resize(0);
 
     //QSerialPort *dulplex_port=new QSerialPort;
     ui->setupUi(this);
+    while(m_serialPortName.empty())
+    {
+        foreach(const QSerialPortInfo &info,QSerialPortInfo::availablePorts())
+        {
+            m_serialPortName << info.portName();//获取可用串口信息
+
+
+            //qDebug()<<"serialPortName:"<<info.portName();
+        }
+    }
+    SerialPort.setPortName(m_serialPortName[0]);
+    //SerialPort.openSerial();
     ui->serial_comboBox->addItems(m_serialPortName);//寻找已经打开的串口
     joy_thread = new Joy_Thread();
     qRegisterMetaType<joyinfoex_tag>("joyinfoex_tag");//注册一种信号的参数类型
@@ -104,13 +117,15 @@ void MainWindow::display_slot_row(joyinfoex_tag state_row)
         SerialCommand.append(uchar(state_row.dwPOV>>8)).append(uchar(state_row.dwPOV));
         SerialCommand.append(uchar(state_row.dwReserved1>>8)).append(uchar(state_row.dwReserved1));
         SerialCommand.append(uchar(state_row.dwReserved2>>8)).append(uchar(state_row.dwReserved2));
-        uint16_t a=SerialCommand[4]<<8|SerialCommand[5];
-        SerialCommand.append('\t');
-
+        //uint16_t a=SerialCommand[2]<<8|SerialCommand[3];
+        //SerialCommand.append('\t');
+        //Sleep(100);
+        //QByteArray b=QByteArray::toHex(state_row.dwFlags);
         if(!SerialPort .WriteToSerial(SerialCommand)){
             s.append("send fail!\n");
         }
-    s.append(SerialPort.ReadFromSerial());
+    //SerialPort.ReadFromSerial();
+    //s.append(parse(SerialPort.ReadFromSerial()));
     }
     ui->textEdit->setText(s);
 
