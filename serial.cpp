@@ -39,9 +39,9 @@ bool MySerial::WriteToSerial(QByteArray cmd)
 QByteArray MySerial::ReadFromSerial()
 {
     QByteArray readData;
-    this->m_SerialPort->waitForReadyRead(25);
+    this->m_SerialPort->waitForReadyRead(5);
     readData.append(this->m_SerialPort->readAll());
-    while (this->m_SerialPort->waitForReadyRead(25)) readData.append(this->m_SerialPort->readAll());
+    while (this->m_SerialPort->waitForReadyRead(5)) readData.append(this->m_SerialPort->readAll());
     if(readData.isEmpty()) return QByteArray();
 //    qDebug() << "[ == MySerial == ] Read Data:" << readData.toHex();
     return readData;

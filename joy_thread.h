@@ -5,7 +5,7 @@
 //#include <QDebug>
 #include "joystick.h"
 
-#define JOY_READ_PEROID  100 //读取手柄周期,单位ms
+#define JOY_READ_PEROID  20 //读取手柄周期,单位ms
 
 class Joy_Thread : public QThread
 {

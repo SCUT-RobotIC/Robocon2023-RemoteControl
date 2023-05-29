@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-
+#include <qtimer.h>
 #include "ui_mainwindow.h"
 
 static Joy_Thread *joy_thread;
@@ -11,6 +11,9 @@ static QString parse(const QByteArray data){
     parsed.append(QString::number(temp)+"\n");
   }
   return parsed;
+}
+void send(joyinfoex_tag state_row){
+
 }
 const QString BTN_color("background-color: rgb(255, 32, 85);");
 
@@ -119,13 +122,14 @@ void MainWindow::display_slot_row(joyinfoex_tag state_row)
         SerialCommand.append(uchar(state_row.dwReserved2>>8)).append(uchar(state_row.dwReserved2));
         //uint16_t a=SerialCommand[2]<<8|SerialCommand[3];
         //SerialCommand.append('\t');
-        //Sleep(100);
         //QByteArray b=QByteArray::toHex(state_row.dwFlags);
-        if(!SerialPort .WriteToSerial(SerialCommand)){
-            s.append("send fail!\n");
-        }
+
+        SerialPort .WriteToSerial(SerialCommand);
+
+
+
     //SerialPort.ReadFromSerial();
-    //s.append(parse(SerialPort.ReadFromSerial()));
+        //s.append(QString(SerialPort.ReadFromSerial()));
     }
     ui->textEdit->setText(s);
 
