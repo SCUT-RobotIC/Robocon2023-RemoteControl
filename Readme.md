@@ -1,7 +1,3 @@
-# 遥控上位机
-
-基于Qt5.15 LTS
-
-利用Windows api读取手柄的信息再使用串口与单片机通信从而实现从电脑控制机器人。
-
-串口部分基于QSerial编写，手柄的轮询利用了QTimer定时中断实现。
+# Robocon2023-RemoteControl-PlanB
+基于Unity的航模遥控器上位机
+目前大概是只有RM TX16S的遥控器能用（理论上别的也能 还没试）
